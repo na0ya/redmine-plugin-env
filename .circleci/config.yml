@@ -8,7 +8,7 @@ jobs:
     executor: redmine_executor/default
     steps:
       - redmine_executor/install
-      - run: "start testing... "
+      - run: echo "start testing... "
 
 workflows:
   main:
