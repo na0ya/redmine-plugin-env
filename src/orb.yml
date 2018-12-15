@@ -42,10 +42,8 @@ commands:
       - run:
           name: Setup Redmine
           command: |
-            cd ~/redmine
             curl http://www.redmine.org/releases/$REDMINE_VER.tar.gz | tar zx
-            mv $REDMINE_VER/* .
-            rm -fr $REDMINE_VER
+            mv $REDMINE_VER ~/redmine
       - save_cache:
          key: v2-gem-cache
          paths:
