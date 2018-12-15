@@ -1,13 +1,52 @@
 version: 2.1
-description: A test orb with an example description.
+description: Executor orb for Redmine Plugin Development
+
+executors:
+  default:
+    description: |
+      Redmine container for plugin development
+    parameters:
+      redmine_ver:
+        type: string
+        default: "3.4.6"
+      orb_working_directory:
+        type: string
+        default: "~/redmine/"
+
+    docker:
+      - image: circleci/ruby:2.3-node-browsers
+        environment:
+          LANG: C.UTF-8
+          REDMINE_VER: redmine-<< parameters.redmine_ver >>
+          RAILS_ENV: test
+          REDMINE_LANG: ja
+          BUNDLE_PATH: /tmp/bundle
+          TZ: Asia/Tokyo
+      - image: circleci/postgres:9.5-alpine
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: redmine_plugin_test
+          POSTGRES_PASSWORD: postgres
 
 commands:
-  hello:
-    description: Greet the user politely
-    parameters:
-      username:
-        type: string
-        description: A name of the user to greet
+  install:
+    description: |
+      setup Redmine from archive
     steps:
-      - run: "echo 'CircleCI Orbs ミニハッカソンへようこそ、<< parameters.username >>！'"
-  
+      - checkout
+      - run: sudo apt-get -y install fonts-ipafont-gothic fonts-ipafont-mincho
+      - run: sudo npm install -g gulp
+      - restore_cache:
+          keys:
+            - v2-gem-cache
+      - run:
+          name: Setup Redmine
+          command: |
+            cd ~/redmine
+            curl http://www.redmine.org/releases/$REDMINE_VER.tar.gz | tar zx
+            mv $REDMINE_VER/* .
+            rm -fr $REDMINE_VER
+      - save_cache:
+         key: v2-gem-cache
+         paths:
+           - /tmp/bundle

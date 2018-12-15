@@ -1,9 +1,16 @@
 version: 2.1
 
 orbs:
-  shellcheck: circleci/shellcheck@1.2.0
+  redmine_executor: na0ya/redmine-plugin-env@dev:0.0.1
+
+jobs:
+  build:
+    executor: redmine_executor/default
+    steps:
+      - redmine_executor/install
+      - run: "start testing..."
 
 workflows:
-  pipeline:
+  main:
     jobs:
-      - shellcheck/check
+      - build
